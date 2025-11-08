@@ -22,9 +22,9 @@ fi
 # Configurable variables
 MACT_USER="mact"
 MACT_HOME="/opt/mact"
-MACT_REPO="https://github.com/yourusername/M-ACT.git"  # Update this!
+MACT_REPO="https://github.com/int33k/M-ACT.git"  # Update this!
 DOMAIN="m-act.live"
-ADMIN_EMAIL="admin@example.com"  # For Let's Encrypt
+ADMIN_EMAIL="22btcs042hy@manuu.edu.in"  # For Let's Encrypt
 
 echo -e "${YELLOW}Step 1/10: Updating system packages...${NC}"
 apt-get update
