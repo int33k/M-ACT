@@ -75,7 +75,7 @@ class FrpcManager:
         import platform
         
         # Determine architecture and download URL
-        FRP_VERSION = "0.52.0"
+        FRP_VERSION = "0.65.0"
         if system == "Windows":
             machine = platform.machine().lower()
         else:
@@ -106,11 +106,11 @@ class FrpcManager:
         # Extract
         print(f"   Extracting...")
         if filename.endswith('.zip'):
-            with zipfile.ZipFile(archive_path, 'r') as zip_ref:
-                zip_ref.extractall(cache_dir)
+            with zipfile.ZipFile(str(archive_path), 'r') as zip_ref:
+                zip_ref.extractall(str(cache_dir))
         else:
-            with tarfile.open(archive_path, 'r:gz') as tar_ref:
-                tar_ref.extractall(cache_dir)
+            with tarfile.open(str(archive_path), 'r:gz') as tar_ref:
+                tar_ref.extractall(str(cache_dir))
         
         # Find and move binary
         extracted_dir = cache_dir / filename.replace('.zip', '').replace('.tar.gz', '')
