@@ -72,10 +72,14 @@ class FrpcManager:
         import urllib.request
         import zipfile
         import tarfile
+        import platform
         
         # Determine architecture and download URL
         FRP_VERSION = "0.52.0"
-        machine = os.uname().machine.lower() if hasattr(os, 'uname') else 'amd64'
+        if system == "Windows":
+            machine = platform.machine().lower()
+        else:
+            machine = os.uname().machine.lower()
         
         if system == "Windows":
             arch = "amd64" if "64" in machine else "386"
@@ -97,7 +101,7 @@ class FrpcManager:
         archive_path = cache_dir / filename
         
         print(f"   Downloading {filename}...")
-        urllib.request.urlretrieve(url, archive_path)
+        urllib.request.urlretrieve(url, str(archive_path))
         
         # Extract
         print(f"   Extracting...")
@@ -115,7 +119,9 @@ class FrpcManager:
         
         if source_binary.exists():
             shutil.move(str(source_binary), str(target_binary))
-            target_binary.chmod(0o755)
+            # Set executable permission on Unix systems
+            if system != "Windows":
+                target_binary.chmod(0o755)
         
         # Cleanup
         archive_path.unlink()

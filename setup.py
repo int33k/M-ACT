@@ -8,8 +8,8 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="mact-cli",
-    version="1.0.4",
-    description="MACT (Mirrored Active Collaborative Tunnel) - Git-driven collaborative development tool",
+    version="1.0.5",
+    description="MACT CLI - Mirrored Active Collaborative Tunnel",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="MACT Team",
