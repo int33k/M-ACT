@@ -13,7 +13,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="MACT Team",
-    author_email="admin@m-act.live",
+    author_email="22btcs042hy@manuu.edu.in",
     url="https://m-act.live",
     project_urls={
         "Source": "https://github.com/int33k/M-ACT",
@@ -23,8 +23,7 @@ setup(
     packages=find_packages(exclude=["tests", "backend", "proxy", "deployment", "scripts"]),
     include_package_data=True,
     package_data={
-        "cli": ["*.py"],
-        "third_party": ["frp/*"],
+        "": ["third_party/frp/frpc", "third_party/frp/frpc.toml", "third_party/frp/LICENSE"],
     },
     install_requires=[
         "requests>=2.25.0",
