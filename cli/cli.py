@@ -32,8 +32,9 @@ def get_config_path() -> Path:
     return Path(home) / ".mact_config.json"
 
 
-DEFAULT_BACKEND = os.getenv("BACKEND_BASE_URL", "http://localhost:5000")
-DEFAULT_FRP_SERVER = os.getenv("FRP_SERVER_ADDR", "127.0.0.1")
+# Default to production server (users can override with environment variables for local dev)
+DEFAULT_BACKEND = os.getenv("BACKEND_BASE_URL", "http://m-act.live")
+DEFAULT_FRP_SERVER = os.getenv("FRP_SERVER_ADDR", "m-act.live")
 DEFAULT_FRP_PORT = int(os.getenv("FRP_SERVER_PORT", "7100"))
 
 
