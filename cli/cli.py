@@ -91,7 +91,9 @@ def cmd_create(args: argparse.Namespace) -> int:
     if subdomain.startswith("http://") or subdomain.startswith("https://"):
         subdomain_url = subdomain
     else:
-        subdomain_url = f"http://{subdomain}.localhost:7101"
+        # Use production domain by extracting base from DEFAULT_BACKEND
+        base_domain = DEFAULT_BACKEND.replace("http://", "").replace("https://", "")
+        subdomain_url = f"http://{subdomain}.{base_domain}"
     
     # Create room via backend
     payload = {"project_name": project_name, "developer_id": developer_id, "subdomain_url": subdomain_url}
@@ -190,7 +192,9 @@ def cmd_join(args: argparse.Namespace) -> int:
     if subdomain.startswith("http://") or subdomain.startswith("https://"):
         subdomain_url = subdomain
     else:
-        subdomain_url = f"http://{subdomain}.localhost:7101"
+        # Use production domain by extracting base from DEFAULT_BACKEND
+        base_domain = DEFAULT_BACKEND.replace("http://", "").replace("https://", "")
+        subdomain_url = f"http://{subdomain}.{base_domain}"
     
     # Join room via backend
     payload = {"room_code": room_code, "developer_id": developer_id, "subdomain_url": subdomain_url}
