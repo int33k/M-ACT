@@ -36,17 +36,22 @@ class FrpcManager:
     
     def _find_frpc_binary(self) -> str:
         """Find frpc binary in vendored location or PATH."""
+        import platform
+        
+        # Determine binary name based on OS
+        binary_name = "frpc.exe" if platform.system() == "Windows" else "frpc"
+        
         # Try vendored binary first
-        vendored = Path(__file__).parent.parent / "third_party" / "frp" / "frpc"
+        vendored = Path(__file__).parent.parent / "third_party" / "frp" / binary_name
         if vendored.exists() and vendored.is_file():
             return str(vendored.absolute())
         
         # Try PATH
-        frpc_path = shutil.which("frpc")
+        frpc_path = shutil.which(binary_name)
         if frpc_path:
             return frpc_path
         
-        raise RuntimeError("frpc binary not found. Please install frp or set FRPC_BIN environment variable.")
+        raise RuntimeError(f"frpc binary not found. Please download frp from https://github.com/fatedier/frp/releases and place {binary_name} in your PATH.")
     
     def _generate_config(self, tunnel: TunnelConfig) -> str:
         """Generate frpc TOML configuration."""
