@@ -10,7 +10,7 @@ MACT (Mirrored Active Collaborative Tunnel) - Git-driven real-time collaboration
 
 ```bash
 # Install via pip (easy!)
-pip install git+https://github.com/int33k/M-ACT.git
+pip install mact-cli
 ```
 
 ### Initialize

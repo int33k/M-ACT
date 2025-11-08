@@ -8,7 +8,7 @@ A collaborative development platform that provides a single, persistent public U
 
 ```bash
 # Install via pip (easy!)
-pip install git+https://github.com/int33k/M-ACT.git
+pip install mact-cli
 
 # Initialize
 mact init --name your-name
