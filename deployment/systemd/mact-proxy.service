@@ -1,0 +1,35 @@
+[Unit]
+Description=MACT Public Routing Proxy (Unit 2)
+Documentation=https://github.com/yourusername/M-ACT
+After=network.target mact-backend.service
+Requires=mact-backend.service
+
+[Service]
+Type=simple
+User=mact
+Group=mact
+WorkingDirectory=/opt/mact
+Environment="PATH=/opt/mact/.venv/bin"
+Environment="PYTHONPATH=/opt/mact"
+EnvironmentFile=/opt/mact/deployment/mact-proxy.env
+ExecStart=/opt/mact/.venv/bin/uvicorn proxy.app:app \
+    --host 127.0.0.1 \
+    --port 8081 \
+    --workers 4 \
+    --timeout-keep-alive 120 \
+    --log-level info
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=mact-proxy
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/mact/logs
+
+[Install]
+WantedBy=multi-user.target

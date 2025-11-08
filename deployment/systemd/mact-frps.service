@@ -1,0 +1,26 @@
+[Unit]
+Description=MACT FRP Server (frps)
+Documentation=https://github.com/yourusername/M-ACT
+After=network.target
+
+[Service]
+Type=simple
+User=mact
+Group=mact
+WorkingDirectory=/opt/mact/third_party/frp
+EnvironmentFile=/opt/mact/deployment/mact-frps.env
+ExecStart=/opt/mact/third_party/frp/frps -c /opt/mact/third_party/frp/mact.frps.toml
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=mact-frps
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

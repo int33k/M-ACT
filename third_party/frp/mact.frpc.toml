@@ -1,0 +1,10 @@
+# Local development configuration for frpc used to expose the backend health endpoint
+serverAddr = "127.0.0.1"
+serverPort = 7100
+
+[[proxies]]
+name = "backend-health"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 5000
+remotePort = 35100

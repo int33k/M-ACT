@@ -1,0 +1,21 @@
+# Include FRP binaries and configs
+recursive-include third_party/frp *
+
+# Include documentation
+include README.md
+include LICENSE
+include INSTALL.md
+recursive-include .docs *.md
+
+# Include configuration templates
+recursive-include deployment *.template
+
+# Exclude test files
+exclude tests/*
+exclude backend/*
+exclude proxy/*
+exclude scripts/*
+prune tests
+prune backend
+prune proxy
+prune scripts

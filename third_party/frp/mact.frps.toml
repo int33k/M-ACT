@@ -1,0 +1,7 @@
+# Local development configuration for frps used by MACT proxy
+# Minimal config for frp v0.65.0
+bindPort = 7100
+vhostHTTPPort = 7101
+
+# Enable subdomain support for HTTP proxies
+subdomainHost = "localhost"
