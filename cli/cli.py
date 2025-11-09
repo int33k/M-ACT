@@ -122,23 +122,18 @@ def cmd_create(args: argparse.Namespace) -> int:
     if not getattr(args, 'no_tunnel', False):
         try:
             frpc = FrpcManager()
-            # Extract subdomain from URL or use the subdomain variable (already computed above)
-            # subdomain variable contains the correct value (either user-provided or auto-generated)
-            tunnel_subdomain = subdomain
-            if "//" in subdomain:
-                # Full URL provided: extract subdomain part
-                tunnel_subdomain = subdomain.split("//")[-1].split(".")[0]
-            
+            # Use room_code as the FRP subdomain (e.g., "al-shifa.m-act.live")
+            # The room_code is sanitized and becomes the public subdomain
             tunnel = TunnelConfig(
                 room_code=room_code,
                 developer_id=developer_id,
                 local_port=local_port,
-                remote_subdomain=tunnel_subdomain,
+                remote_subdomain=room_code,
                 server_addr=DEFAULT_FRP_SERVER,
                 server_port=DEFAULT_FRP_PORT
             )
             if frpc.start_tunnel(tunnel):
-                print(f"✓ Tunnel started: {tunnel_subdomain} -> localhost:{local_port}")
+                print(f"✓ Tunnel started: {room_code}.m-act.live -> localhost:{local_port}")
             else:
                 print(f"✗ Failed to start tunnel (continuing anyway)")
                 print(f"  Tip: Check if frpc binary exists and frps server is running on port {DEFAULT_FRP_PORT}")
@@ -221,22 +216,17 @@ def cmd_join(args: argparse.Namespace) -> int:
     if not getattr(args, 'no_tunnel', False):
         try:
             frpc = FrpcManager()
-            # Extract subdomain from URL or use as-is (subdomain variable already computed above)
-            tunnel_subdomain = subdomain
-            if "//" in subdomain:
-                # Full URL provided: extract subdomain part
-                tunnel_subdomain = subdomain.split("//")[-1].split(".")[0]
-            
+            # Use room_code as the FRP subdomain
             tunnel = TunnelConfig(
                 room_code=room_code,
                 developer_id=developer_id,
                 local_port=local_port,
-                remote_subdomain=tunnel_subdomain,
+                remote_subdomain=room_code,
                 server_addr=DEFAULT_FRP_SERVER,
                 server_port=DEFAULT_FRP_PORT
             )
             if frpc.start_tunnel(tunnel):
-                print(f"✓ Tunnel started: {tunnel_subdomain} -> localhost:{local_port}")
+                print(f"✓ Tunnel started: {room_code}.m-act.live -> localhost:{local_port}")
             else:
                 print(f"✗ Failed to start tunnel (continuing anyway)")
                 print(f"  Tip: Check if frpc binary exists and frps server is running on port {DEFAULT_FRP_PORT}")

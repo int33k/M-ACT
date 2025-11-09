@@ -143,11 +143,11 @@ serverAddr = "{tunnel.server_addr}"
 serverPort = {tunnel.server_port}
 
 [[proxies]]
-name = "{tunnel.room_code}-{tunnel.developer_id}"
+name = "{tunnel.developer_id}-{tunnel.room_code}"
 type = "http"
 localIP = "127.0.0.1"
 localPort = {tunnel.local_port}
-subdomain = "{tunnel.remote_subdomain}"
+subdomain = "{tunnel.room_code}"
 """
     
     def start_tunnel(self, tunnel: TunnelConfig) -> bool:
