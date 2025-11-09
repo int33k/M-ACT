@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mact-cli"
-version = "1.0.6"
+version = "1.0.8"
 description = "MACT CLI - Mirrored Active Collaborative Tunnel"
 readme = "README.md"
 requires-python = ">=3.8"

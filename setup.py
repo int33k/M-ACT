@@ -8,7 +8,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="mact-cli",
-    version="1.0.6",
+    version="1.0.8",
     description="MACT CLI - Mirrored Active Collaborative Tunnel",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -20,10 +20,13 @@ setup(
         "Documentation": "https://github.com/int33k/M-ACT/tree/main/.docs",
         "Bug Tracker": "https://github.com/int33k/M-ACT/issues",
     },
-    packages=find_packages(exclude=["tests", "backend", "proxy", "deployment", "scripts"]),
+    packages=find_packages(exclude=["tests", "backend", "proxy", "deployment", "scripts", "third_party"]),
     include_package_data=True,
     package_data={
-        "": ["third_party/frp/frpc", "third_party/frp/frpc.toml", "third_party/frp/LICENSE"],
+        "cli": [
+            "frp_binaries/frpc",
+            "frp_binaries/frpc.exe",
+        ],
     },
     install_requires=[
         "requests>=2.25.0",

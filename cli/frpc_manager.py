@@ -6,6 +6,7 @@ for developer rooms.
 from __future__ import annotations
 
 import os
+import platform
 import shutil
 import subprocess
 import tempfile
@@ -44,10 +45,15 @@ class FrpcManager:
         system = platform.system()
         binary_name = "frpc.exe" if system == "Windows" else "frpc"
         
-        # Try vendored binary first
-        vendored = Path(__file__).parent.parent / "third_party" / "frp" / binary_name
+        # Try vendored binary first (bundled in package)
+        vendored = Path(__file__).parent / "frp_binaries" / binary_name
         if vendored.exists() and vendored.is_file():
             return str(vendored.absolute())
+        
+        # Try old third_party location (for dev installs)
+        vendored_old = Path(__file__).parent.parent / "third_party" / "frp" / binary_name
+        if vendored_old.exists() and vendored_old.is_file():
+            return str(vendored_old.absolute())
         
         # Try PATH
         frpc_path = shutil.which(binary_name)
@@ -162,15 +168,30 @@ subdomain = "{tunnel.remote_subdomain}"
         
         # Start frpc
         try:
+            # On Windows, use shell=True to avoid permission issues
+            is_windows = platform.system() == "Windows"
+            
             proc = subprocess.Popen(
                 [self.frpc_binary, "-c", str(config_file)],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
+                shell=is_windows,
             )
             self._processes[key] = proc
+            
+            # Give it a moment to start and check if it failed immediately
+            import time
+            time.sleep(0.5)
+            if proc.poll() is not None:
+                raise RuntimeError(f"frpc exited immediately with code {proc.returncode}")
+            
             return True
         except Exception as e:
-            print(f"Failed to start frpc: {e}")
+            error_msg = f"Failed to start frpc: {e}"
+            if "Access is denied" in str(e) or "WinError 5" in str(e):
+                error_msg += "\n  This may be caused by antivirus software blocking frpc.exe"
+                error_msg += f"\n  Try adding '{self.frpc_binary}' to your antivirus exceptions"
+            print(error_msg)
             return False
     
     def stop_tunnel(self, room_code: str, developer_id: str) -> bool:
