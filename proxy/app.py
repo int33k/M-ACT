@@ -670,16 +670,32 @@ async def mirror(request: Request) -> StreamingResponse:
             status_code=503,
         )
     
+    # WORKAROUND: Parse special format from backend: "http://127.0.0.1:7101|Host:room.m-act.live"
+    # This allows backend to specify both the FRP endpoint and the Host header to use
+    custom_host_header = None
+    if "|Host:" in active_url:
+        base_url, host_part = active_url.split("|Host:", 1)
+        active_url = base_url
+        custom_host_header = host_part
+        logger.info(f"[MIRROR DEBUG] Using FRP endpoint {active_url} with Host: {custom_host_header}")
+    
     target_url = _build_target_url(active_url, path)
     logger.info(f"[MIRROR DEBUG] Fetching from: {target_url}")
     
     async with httpx.AsyncClient(timeout=DEFAULT_TIMEOUT_SECONDS) as client:
         try:
+            # Prepare headers for the upstream request
+            upstream_headers = _forward_headers(request.headers)
+            
+            # Override Host header if backend specified one (for FRP vhost routing)
+            if custom_host_header:
+                upstream_headers["host"] = custom_host_header
+            
             # Fetch the complete response
             response = await client.get(
                 url=target_url,
                 params=dict(request.query_params),
-                headers=_forward_headers(request.headers),
+                headers=upstream_headers,
                 follow_redirects=False,
             )
             

@@ -35,7 +35,8 @@ def get_config_path() -> Path:
 # Default to production server (users can override with environment variables for local dev)
 DEFAULT_BACKEND = os.getenv("BACKEND_BASE_URL", "http://m-act.live")
 DEFAULT_FRP_SERVER = os.getenv("FRP_SERVER_ADDR", "m-act.live")
-DEFAULT_FRP_PORT = int(os.getenv("FRP_SERVER_PORT", "7100"))
+DEFAULT_FRP_PORT = int(os.getenv("FRP_SERVER_PORT", "7100"))  # Control port for frpc
+DEFAULT_FRP_HTTP_PORT = int(os.getenv("FRP_HTTP_PORT", "7101"))  # HTTP port for accessing tunnels
 
 
 def load_config() -> Dict[str, str]:
@@ -87,13 +88,15 @@ def cmd_create(args: argparse.Namespace) -> int:
         subdomain = f"dev-{developer_id}-{project_name.lower()}"
     
     # Construct full subdomain URL for backend
+    # This should point to where the FRP tunnel is accessible, not the backend
     # If subdomain is already a full URL, use it; otherwise construct it
     if subdomain.startswith("http://") or subdomain.startswith("https://"):
         subdomain_url = subdomain
     else:
-        # Use production domain by extracting base from DEFAULT_BACKEND
-        base_domain = DEFAULT_BACKEND.replace("http://", "").replace("https://", "")
-        subdomain_url = f"http://{subdomain}.{base_domain}"
+        # Construct URL pointing to FRP HTTP server (vhostHTTPPort, not control port)
+        # Extract just the hostname from backend URL (remove port)
+        backend_host = DEFAULT_BACKEND.replace("http://", "").replace("https://", "").split(":")[0]
+        subdomain_url = f"http://{subdomain}.{backend_host}:{DEFAULT_FRP_HTTP_PORT}"
     
     # Create room via backend
     payload = {"project_name": project_name, "developer_id": developer_id, "subdomain_url": subdomain_url}
@@ -122,13 +125,15 @@ def cmd_create(args: argparse.Namespace) -> int:
     if not getattr(args, 'no_tunnel', False):
         try:
             frpc = FrpcManager()
-            # Use room_code as the FRP subdomain (e.g., "al-shifa.m-act.live")
-            # The room_code is sanitized and becomes the public subdomain
+            # Extract subdomain from subdomain_url (e.g., "dev-rahbar-mact-demo-e2e" from "http://dev-rahbar-mact-demo-e2e.m-act.live")
+            # This is the developer-specific tunnel subdomain
+            tunnel_subdomain = subdomain_url.replace("http://", "").replace("https://", "").split(".")[0]
+            
             tunnel = TunnelConfig(
                 room_code=room_code,
                 developer_id=developer_id,
                 local_port=local_port,
-                remote_subdomain=room_code,
+                remote_subdomain=tunnel_subdomain,
                 server_addr=DEFAULT_FRP_SERVER,
                 server_port=DEFAULT_FRP_PORT
             )
@@ -184,12 +189,13 @@ def cmd_join(args: argparse.Namespace) -> int:
         subdomain = f"dev-{developer_id}-{room_code}"
     
     # Construct full subdomain URL for backend
+    # This should point to where the FRP tunnel is accessible
     if subdomain.startswith("http://") or subdomain.startswith("https://"):
         subdomain_url = subdomain
     else:
-        # Use production domain by extracting base from DEFAULT_BACKEND
-        base_domain = DEFAULT_BACKEND.replace("http://", "").replace("https://", "")
-        subdomain_url = f"http://{subdomain}.{base_domain}"
+        # Construct URL pointing to FRP HTTP server (vhostHTTPPort, not control port)
+        backend_host = DEFAULT_BACKEND.replace("http://", "").replace("https://", "").split(":")[0]
+        subdomain_url = f"http://{subdomain}.{backend_host}:{DEFAULT_FRP_HTTP_PORT}"
     
     # Join room via backend
     payload = {"room_code": room_code, "developer_id": developer_id, "subdomain_url": subdomain_url}
@@ -216,12 +222,14 @@ def cmd_join(args: argparse.Namespace) -> int:
     if not getattr(args, 'no_tunnel', False):
         try:
             frpc = FrpcManager()
-            # Use room_code as the FRP subdomain
+            # Extract subdomain from subdomain_url (e.g., "dev-sanaullah-mact-demo-e2e" from "http://dev-sanaullah-mact-demo-e2e.m-act.live")
+            tunnel_subdomain = subdomain_url.replace("http://", "").replace("https://", "").split(".")[0]
+            
             tunnel = TunnelConfig(
                 room_code=room_code,
                 developer_id=developer_id,
                 local_port=local_port,
-                remote_subdomain=room_code,
+                remote_subdomain=tunnel_subdomain,
                 server_addr=DEFAULT_FRP_SERVER,
                 server_port=DEFAULT_FRP_PORT
             )

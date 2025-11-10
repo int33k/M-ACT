@@ -147,7 +147,7 @@ name = "{tunnel.developer_id}-{tunnel.room_code}"
 type = "http"
 localIP = "127.0.0.1"
 localPort = {tunnel.local_port}
-subdomain = "{tunnel.room_code}"
+subdomain = "{tunnel.remote_subdomain}"
 """
     
     def start_tunnel(self, tunnel: TunnelConfig) -> bool:

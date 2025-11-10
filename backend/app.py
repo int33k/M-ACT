@@ -269,16 +269,38 @@ def get_active_url():
     if not active_developer and participants:
         active_developer = next(iter(participants.keys()))
     
-    # Get the URL for the active developer
+    # Get the subdomain for the active developer
     if active_developer:
         info = participants[active_developer]
         # Handle both old format (string) and new format (dict)
-        active_url = info.get("subdomain_url") if isinstance(info, dict) else info
+        subdomain_url = info.get("subdomain_url") if isinstance(info, dict) else info
+        
+        # WORKAROUND: Convert public subdomain to FRP internal endpoint
+        # The proxy needs to fetch from the FRP vhost (port 7101), not the public URL
+        # Each developer has their own FRP tunnel with subdomain: dev-{developer}-{room}.m-act.live
+        if subdomain_url:
+            # Extract the full subdomain from the public URL
+            # Format: http://dev-{developer}-{room}.m-act.live
+            # We need to use this exact subdomain as the Host header for FRP vhost routing
+            try:
+                # Parse the subdomain from the URL (e.g., "dev-rahba-hospital.m-act.live")
+                from urllib.parse import urlparse
+                parsed = urlparse(subdomain_url)
+                frp_host = parsed.netloc  # e.g., "dev-rahba-hospital.m-act.live"
+                
+                # The FRP internal endpoint is always http://127.0.0.1:7101 with the developer's Host header
+                active_url = f"http://127.0.0.1:7101|Host:{frp_host}"
+            except Exception as e:
+                print(f"[ERROR] Failed to parse subdomain URL '{subdomain_url}': {e}")
+                active_url = None
+        else:
+            active_url = None
     else:
         active_url = None
 
     # DEBUG: Log what we're returning
     print(f"[DEBUG] get_active_url for room '{room_code}': returning '{active_url}'")
+    print(f"[DEBUG] Active developer: {active_developer}")
     print(f"[DEBUG] Participants: {dict(participants)}")
     print(f"[DEBUG] Commits count: {len(commits)}")
 
